@@ -5,6 +5,7 @@ export interface Product {
   value: number
   quantidade: number
   total: number
+  user_id?: string
 }
 
 export interface ProductInsert {
@@ -16,6 +17,7 @@ export interface ProductInsert {
 
 export function useProducts() {
   const supabase = useSupabaseClient()
+  const user = useSupabaseUser()
   const products = ref<Product[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -25,9 +27,15 @@ export function useProducts() {
     error.value = null
 
     try {
+      if (!user.value) {
+        products.value = []
+        return
+      }
+
       const { data, error: err } = await supabase
         .from('products')
         .select('*')
+        .eq('user_id', user.value.id)
         .order('created_at', { ascending: false })
 
       if (err) throw err
@@ -45,9 +53,16 @@ export function useProducts() {
     error.value = null
 
     try {
+      if (!user.value) {
+        throw new Error('Usuário não autenticado')
+      }
+
       const { data, error: err } = await supabase
         .from('products')
-        .insert([product])
+        .insert([{
+          ...product,
+          user_id: user.value.id
+        }])
         .select()
         .single()
 
@@ -70,10 +85,15 @@ export function useProducts() {
     error.value = null
 
     try {
+      if (!user.value) {
+        throw new Error('Usuário não autenticado')
+      }
+
       const { error: err } = await supabase
         .from('products')
         .delete()
         .eq('id', id)
+        .eq('user_id', user.value.id)
 
       if (err) throw err
       products.value = products.value.filter(p => p.id !== id)
@@ -92,10 +112,15 @@ export function useProducts() {
     error.value = null
 
     try {
+      if (!user.value) {
+        throw new Error('Usuário não autenticado')
+      }
+
       const { data, error: err } = await supabase
         .from('products')
         .update(updates)
         .eq('id', id)
+        .eq('user_id', user.value.id)
         .select()
         .single()
 

@@ -21,7 +21,7 @@
             </div>
           </div>
 
-          <!-- Lado Direito: Status + Toggle + Data -->
+          <!-- Lado Direito: Status + Toggle + Data + Logout -->
           <div class="flex items-center gap-3 sm:gap-4">
             <!-- Loading Indicator -->
             <span v-if="loading" class="hidden sm:flex items-center gap-2 text-sm text-indigo-600 dark:text-indigo-400">
@@ -30,6 +30,11 @@
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               <span class="hidden md:inline">Sincronizando...</span>
+            </span>
+
+            <!-- User Email -->
+            <span v-if="user" class="text-xs text-gray-500 dark:text-gray-400 hidden lg:block truncate max-w-[150px]">
+              {{ user.email }}
             </span>
 
             <!-- Theme Toggle Button -->
@@ -57,6 +62,17 @@
                 viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+              </svg>
+            </button>
+
+            <!-- Logout Button -->
+            <button
+              @click="signOut"
+              class="relative p-2 sm:p-2.5 rounded-xl bg-gray-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-900/20 text-gray-600 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-all duration-300 group"
+              title="Sair"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
               </svg>
             </button>
 
@@ -127,7 +143,12 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({
+  middleware: 'auth'
+})
+
 const { products, loading, error, fetchProducts, addProduct, deleteProduct } = useProducts()
+const { signOut, user } = useAuth()
 
 const searchTerm = ref('')
 const sortBy = ref('name')

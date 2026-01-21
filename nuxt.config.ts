@@ -8,7 +8,15 @@ export default defineNuxtConfig({
     configPath: 'tailwind.config.ts'
   },
   supabase: {
-    redirect: false
+    redirect: false,
+    redirectOptions: {
+      login: '/login',
+      callback: '/confirm'
+    }
+  },
+  routeRules: {
+    '/': { ssr: false },
+    '/login': { ssr: false }
   },
   nitro: {
     preset: 'vercel'
