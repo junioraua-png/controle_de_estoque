@@ -114,6 +114,19 @@
         v-model:filter="stockFilter"
       />
 
+      <!-- Botão de Teste -->
+      <div class="mb-6 flex justify-center">
+        <button
+          @click="testarToast"
+          class="px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+          Testar Toast
+        </button>
+      </div>
+
       <!-- Form -->
       <StockForm @add-stock="addStock" :loading="loading" />
 
@@ -255,6 +268,22 @@ async function removeStock(id: number) {
   } else {
     toast.error(result.error || 'Erro ao remover produto')
   }
+}
+
+function testarToast() {
+  const tipos = ['success', 'error', 'warning', 'info']
+  const mensagens = [
+    'Operação realizada com sucesso! 🎉',
+    'Ocorreu um erro no sistema! ⚠️',
+    'Atenção! Estoque baixo! 📦',
+    'Informação importante para você! 💡'
+  ]
+  
+  const randomIndex = Math.floor(Math.random() * tipos.length)
+  const tipo = tipos[randomIndex] as 'success' | 'error' | 'warning' | 'info'
+  const mensagem = mensagens[randomIndex]
+  
+  toast[tipo](mensagem)
 }
 </script>
 
