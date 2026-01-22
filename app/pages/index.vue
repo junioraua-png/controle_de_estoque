@@ -120,25 +120,6 @@
       <!-- List -->
       <StockList :items="filteredItems" :loading="loading" @remove="removeStock" />
     </main>
-
-    <!-- Footer -->
-    <footer class="border-t border-gray-200 dark:border-slate-800 mt-auto bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p class="text-sm text-gray-500 dark:text-gray-400 text-center sm:text-left">
-            <span class="font-semibold bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 bg-clip-text text-transparent">
-              Controle de Estoque
-            </span>
-            &copy; {{ new Date().getFullYear() }}
-          </p>
-          <div class="flex items-center gap-2 text-xs text-gray-400 dark:text-gray-500">
-            <span class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full font-medium">Nuxt 4</span>
-            <span class="px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-400 rounded-full font-medium">Tailwind</span>
-            <span class="px-2 py-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full font-medium">Supabase</span>
-          </div>
-        </div>
-      </div>
-    </footer>
   </div>
 </template>
 
@@ -149,6 +130,7 @@ definePageMeta({
 
 const { products, loading, error, fetchProducts, addProduct, deleteProduct } = useProducts()
 const { signOut, user } = useAuth()
+const toast = useToast()
 
 const searchTerm = ref('')
 const sortBy = ref('name')
@@ -250,16 +232,29 @@ const filteredItems = computed(() => {
 
 async function addStock(payload: { name: string; qty: number; price: number }) {
   const total = payload.qty * payload.price
-  await addProduct({
+  const result = await addProduct({
     name_product: payload.name,
     quantidade: payload.qty,
     value: payload.price,
     total: total
   })
+  
+  if (result.success) {
+    toast.success(`Produto "${payload.name}" adicionado com sucesso!`)
+  } else {
+    toast.error(result.error || 'Erro ao adicionar produto')
+  }
 }
 
 async function removeStock(id: number) {
-  await deleteProduct(id)
+  const product = products.value.find(p => p.id === id)
+  const result = await deleteProduct(id)
+  
+  if (result.success) {
+    toast.success(`Produto "${product?.name_product || 'item'}" removido com sucesso!`)
+  } else {
+    toast.error(result.error || 'Erro ao remover produto')
+  }
 }
 </script>
 

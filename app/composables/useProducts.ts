@@ -18,6 +18,7 @@ export interface ProductInsert {
 export function useProducts() {
   const supabase = useSupabaseClient()
   const user = useSupabaseUser()
+  const toast = useToast()
   const products = ref<Product[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -42,6 +43,7 @@ export function useProducts() {
       products.value = data || []
     } catch (e: any) {
       error.value = e.message
+      toast.error('Erro ao carregar produtos')
       console.error('Erro ao buscar produtos:', e)
     } finally {
       loading.value = false

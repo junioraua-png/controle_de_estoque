@@ -1,6 +1,7 @@
 export const useAuth = () => {
   const supabase = useSupabaseClient()
   const user = useSupabaseUser()
+  const toast = useToast()
 
   const loading = ref(false)
   const error = ref<string | null>(null)
@@ -17,9 +18,11 @@ export const useAuth = () => {
 
       if (authError) throw authError
 
+      toast.success('Login realizado com sucesso!')
       await navigateTo('/')
     } catch (e: any) {
       error.value = e.message || 'Erro ao fazer login'
+      toast.error(error.value)
       console.error('Erro de autenticação:', e)
     } finally {
       loading.value = false
@@ -59,9 +62,11 @@ export const useAuth = () => {
         }
       }
 
+      toast.success('Conta criada com sucesso! Verifique seu e-mail para confirmar.')
       return true
     } catch (e: any) {
       error.value = e.message || 'Erro ao criar conta'
+      toast.error(error.value)
       console.error('Erro ao criar conta:', e)
       return false
     } finally {
@@ -78,9 +83,11 @@ export const useAuth = () => {
 
       if (authError) throw authError
 
+      toast.info('Você saiu da sua conta')
       await navigateTo('/login')
     } catch (e: any) {
       error.value = e.message || 'Erro ao fazer logout'
+      toast.error(error.value)
       console.error('Erro ao fazer logout:', e)
     } finally {
       loading.value = false
@@ -98,9 +105,11 @@ export const useAuth = () => {
 
       if (authError) throw authError
 
+      toast.success('E-mail de recuperação enviado! Verifique sua caixa de entrada.')
       return true
     } catch (e: any) {
       error.value = e.message || 'Erro ao enviar e-mail de recuperação'
+      toast.error(error.value)
       console.error('Erro ao recuperar senha:', e)
       return false
     } finally {
